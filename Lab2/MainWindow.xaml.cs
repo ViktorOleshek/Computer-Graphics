@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Syncfusion.Windows.Shared;
+using Syncfusion.Windows.Shared.Resources;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -14,6 +17,9 @@ namespace Lab2
   public partial class MainWindow : Window
   {
     private ObservableCollection<Point> controlPoints = new ObservableCollection<Point>();
+    /// <summary>
+    /// крива Без'є
+    /// </summary>
     private Polyline polyline;
     private double currentScale = 1.0;
     int intervalCount = 13;
@@ -188,25 +194,14 @@ namespace Lab2
 
     private void InitializeUI()
     {
-      //btnDrawCurve.Click += BtnDrawCurve_Click;
-
       polyline = new Polyline
       {
-        Stroke = Brushes.Black,
+        Stroke = Brushes.Red,
         StrokeThickness = 2
       };
       canvas.Children.Add(polyline);
 
       lstControlPoints.ItemsSource = controlPoints;
-
-      foreach (var controlPoint in canvas.Children.OfType<Ellipse>())
-      {
-        controlPoint.MouseDown += ControlPoint_MouseDown;
-        controlPoint.MouseUp += ControlPoint_MouseUp;
-        controlPoint.MouseMove += ControlPoint_MouseMove;
-      }
-
-      canvas.MouseUp += Canvas_MouseUp;
     }
 
     private void BtnAdd_Click(object sender, RoutedEventArgs e)
@@ -222,17 +217,29 @@ namespace Lab2
         MessageBox.Show("Некоректні координати точки. Введіть числові значення.");
       }
     }
-
-    private void BtnDrawCurve_Click(object sender, RoutedEventArgs e)
+    private void ClearCanvas()
     {
       MatrixInfo.Text = null;
+      polyline.Points.Clear();
+
+      var elementsToRemove = canvas.Children
+          .OfType<Polygon>()
+          .Where(polygon => polygon.Stroke is SolidColorBrush && ((SolidColorBrush) polygon.Stroke).Color == Colors.Blue)
+          .ToList();
+
+      foreach (var elementToRemove in elementsToRemove)
+      {
+        canvas.Children.Remove(elementToRemove);
+      }
+    }
+    private void BtnDrawCurve_Click(object sender, RoutedEventArgs e)
+    {
+      ClearCanvas();
       DrawBezierCurve();
     }
 
     private void DrawBezierCurve()
     {
-      polyline.Points.Clear();
-
       if (controlPoints.Count < 2)
       {
         MessageBox.Show("Для побудови кривої потрібно не менше двох точок.");
@@ -251,8 +258,38 @@ namespace Lab2
         polyline.Points.Add((Point) curvePoint);
       }
 
-      DisplayMatrixInformation();
       HighlightPolygon();
+    }
+
+    private string UserChooseFormula()
+    {
+      var selectedComboBoxItem = Formula.SelectedItem as ComboBoxItem;
+
+      if (selectedComboBoxItem == null)
+      {
+        MessageBox.Show("Виберіть за якою формулою обчислювати.");
+        return null;
+      }
+
+      return selectedComboBoxItem.Content?.ToString();
+    }
+    private Point? CalculateBezierPoint(double t)
+    {
+      string str = UserChooseFormula();
+
+      if (str.IsNullOrWhiteSpace())
+      {
+        return null;
+      }
+      else if (str.Equals("Параметрична формула"))
+      {
+        return CalculateParametricFormula(t);
+      }
+      else
+      {
+        DisplayMatrixInformation();
+        return CalculateMatrixFormula(t);
+      }
     }
 
     private void DisplayMatrixInformation()
@@ -262,20 +299,20 @@ namespace Lab2
       double [,] matrix = Matrix.CreateCoefMatrix(n);
 
 
+      matrixInfo.AppendLine($"Ненульові елементи матриці:");
       for (int i = 0; i <= n; i++)
       {
-        matrixInfo.AppendLine($"Для {i + 1} рядка:");
-
+        string str = "";
         for (int j = 0; j <= n; j++)
         {
           double coefficient = BinomialCoefficient(n, j) * Math.Pow((1 - i), (n - j)) * Math.Pow(i, j);
           //matrix [i, j] = coefficient;
           if (matrix [i, j] != 0)
           {
-            matrixInfo.AppendLine($"  Коефіцієнт {j}: {matrix [i, j]}");
-
+            str += $"({i};{j}), ";
           }
         }
+        matrixInfo.AppendLine(str);
       }
 
       // Виведення інформації про матрицю
@@ -301,25 +338,6 @@ namespace Lab2
 
       MatrixInfo.Text = matrixInfo.ToString();
     }
-
-    private Point? CalculateBezierPoint(double t)
-    {
-      var str = Formula.SelectedValue?.ToString();
-      if (str == null)
-      {
-        MessageBox.Show("Виберіть за якою формулою обчислювати.");
-        return null;
-      }
-      else if (str.Equals("Параметрична формула"))
-      {
-        return CalculateParametricFormula(t);
-      }
-      else
-      {
-        return CalculateMatrixFormula(t);
-      }
-    }
-
 
     private void HighlightPolygon()
     {
@@ -393,39 +411,6 @@ namespace Lab2
       return result;
     }
 
-    private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
-    {
-      selectedControlPoint = null;
-    }
-
-    private void ControlPoint_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-      selectedControlPoint = (Ellipse) sender;
-      e.Handled = true;
-    }
-
-    private void ControlPoint_MouseUp(object sender, MouseButtonEventArgs e)
-    {
-      selectedControlPoint = null;
-    }
-
-    private void ControlPoint_MouseMove(object sender, MouseEventArgs e)
-    {
-      if (selectedControlPoint != null && e.LeftButton == MouseButtonState.Pressed)
-      {
-        var ellipse = (Ellipse) sender;
-        var position = e.GetPosition(canvas);
-        var index = canvas.Children.IndexOf(ellipse);
-
-        controlPoints [index] = new Point(
-            (position.X - canvas.ActualWidth / 2) / (currentScale * intervalSize),
-            (canvas.ActualHeight / 2 - position.Y) / (currentScale * intervalSize)
-        );
-
-        DrawBezierCurve();
-      }
-    }
-
     private void CreateControlPoint(double x, double y)
     {
       Ellipse controlPoint = new Ellipse
@@ -441,10 +426,6 @@ namespace Lab2
       Canvas.SetLeft(controlPoint, (x * intervalSize * currentScale) + canvas.ActualWidth / 2 - controlPoint.Width / 2);
       Canvas.SetTop(controlPoint, canvas.ActualHeight / 2 - (y * intervalSize * currentScale) - controlPoint.Height / 2);
 
-      controlPoint.MouseUp += ControlPoint_MouseUp;
-      controlPoint.MouseDown += ControlPoint_MouseDown;
-      controlPoint.MouseMove += ControlPoint_MouseMove;
-
       canvas.Children.Add(controlPoint);
     }
 
@@ -455,23 +436,23 @@ namespace Lab2
       double minT, maxT, step;
       if (double.TryParse(minValue.Text, out minT) && double.TryParse(maxValue.Text, out maxT) && double.TryParse(stepLenght.Text, out step))
       {
-        if (maxT < minT)
+        if (maxT < minT || minT < 0 || maxT > 1 || step > 1)
         {
           MessageBox.Show("Максимальне значення t повинно бути більше мінімального значення t.");
           return;
         }
 
-        double t = minT;
-        while (t <= maxT)
+        for (double t = minT; t <= maxT; t += step)
         {
-          Point? curvePoint = CalculateBezierPoint(t);
+          Point curvePoint = CalculateParametricFormula(t);
           if (curvePoint == null) { return; }
 
-          double x = ((Point) curvePoint).X * currentScale;
-          double y = ((Point) curvePoint).Y * currentScale;
+          double centerX = canvas.ActualWidth / 2;
+          double centerY = canvas.ActualHeight / 2;
+          double x = (curvePoint.X - centerX) / currentScale / intervalSize;
+          double y = (curvePoint.Y - centerY) / currentScale / intervalSize * (-1);
 
-          pointsStringBuilder.AppendLine($"Точка для t = {t}: X = {x}, Y = {y}");
-          t += step;
+          pointsStringBuilder.AppendLine($"Точка для t = {t}:\t X = {x:F4},\t Y = {y:F4}");
         }
 
         MessageBox.Show(pointsStringBuilder.ToString(), "Координати точок кривої");

@@ -57,9 +57,9 @@
             <Button x:Name="btnDrawCurve" Content="Намалювати криву" Margin="10" Click="BtnDrawCurve_Click"/>
 
             <Label Content="X:" Margin="210, 0, 0, 90"/>
-            <TextBox x:Name="txtX" Margin="240, 0, 0, 90"/>
+            <TextBox x:Name="txtX" Margin="240, 0, 0, 90" Text="5"/>
             <Label Content="Y:" Margin="210, 0, 0, 50"/>
-            <TextBox x:Name="txtY" Margin="240, 0, 0, 50"/>
+            <TextBox x:Name="txtY" Margin="240, 0, 0, 50" Text="5"/>
             <Button x:Name="btnAdd" Content="Додати точку" Margin="210,0,0,10" Click="BtnAdd_Click"/>
 
             <Label Content="Points:" Margin="310, 0, 0, 140"/>
