@@ -1,0 +1,55 @@
+﻿<Window x:Class="Lab3.InputForms.SnowflakeKoh"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lab3.InputForms"
+        mc:Ignorable="d"
+        Title="SnowflakeKoh" Height="160" Width="400">
+    
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="Label">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Label Content="Кількість ітерацій:" Margin="10,0,0,90"/>
+        <TextBox x:Name="textBox_numbersOfStep" Margin="130,0,0,90" Text="2"/>
+        
+        <Label Content="Центр генерування:" Margin="10,0,0,50"/>
+        <TextBox x:Name="textBox_centerX" Margin="130,0,0,50" Text="350"/>
+        <TextBox x:Name="textBox_centerY" Margin="190,0,0,50" Text="200"/>
+        
+        <Label Content="Крок:" Margin="10,0,0,10"/>
+        <TextBox x:Name="textBox_step" Margin="130,0,0,10" Text="0,1"/>
+
+        <Button Content="Побудувати фрактал" Margin="0,0,10,10" Click="BuildFractalButton_Click" HorizontalAlignment="Right"/>
+    </Grid>
+</Window>
