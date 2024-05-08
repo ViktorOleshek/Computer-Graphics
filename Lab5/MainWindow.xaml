@@ -1,0 +1,62 @@
+﻿<Window x:Class="Lab5.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lab5"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="1000" Background="#FF678ABD" 
+        Loaded="Window_Loaded" PreviewKeyDown="Window_PreviewKeyDown">
+
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="Label">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="mainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="150" />
+        </Grid.RowDefinitions>
+
+        <Canvas x:Name="canvas" Grid.Row="0" Grid.Column="0" Background="White"
+                MouseWheel="Canvas_MouseWheel">
+        </Canvas>
+        <Grid Grid.Row="1">
+            <Button x:Name="btnAdd" Content="Побудувати квадрат" Margin="10,0,0,10" Click="DrawSquare_Click"/>
+
+            <Button x:Name="startButton" Content="Старт" Margin="150,0,0,10" Click="StartAnimation_Click"/>
+            <Button x:Name="stopButton" Content="Стоп" Margin="200,0,0,10" Click="StopAnimation_Click"/>
+
+            <Button Content="Зберегти фото" Margin="0,0,150,10" Click="SavePhoto_Click" HorizontalAlignment="Right"/>
+            <Button Content="Зберегти матрицю" Margin="0,0,10,10" Click="SaveTransformMatrix_Click" HorizontalAlignment="Right"/>
+        </Grid>
+    </Grid>
+</Window>
